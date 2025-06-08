@@ -1,6 +1,7 @@
 'use client';
+
 import { useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 
 const branchOptions = {
   CSE: 'Computer Science & Engineering',
@@ -14,7 +15,16 @@ const branchOptions = {
   CE: 'Civil Engineering',
 };
 
-export default function PreferencesForm() {
+// ✅ NEW: Wrap the main component inside <Suspense>
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading form...</div>}>
+      <PreferencesForm />
+    </Suspense>
+  );
+}
+
+function PreferencesForm() {
   const params = useSearchParams();
   const appIdFromQuery = params.get('appId') || '';
 
