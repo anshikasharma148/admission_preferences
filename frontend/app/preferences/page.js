@@ -26,12 +26,13 @@ export default function Page() {
 function PreferencesForm() {
   const params = useSearchParams();
   const appIdFromQuery = params.get('appId') || '';
+  const dobFromQuery = params.get('dob') || '';
 
   const initialFormState = {
     applicationNo: appIdFromQuery,
     name: '',
     rollNo: '',
-    dob: '',
+    dob: dobFromQuery,
     mobile: '',
     Preference1: '',
     Preference2: '',

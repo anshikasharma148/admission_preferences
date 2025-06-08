@@ -8,22 +8,23 @@ export default function LoginForm() {
   const router = useRouter();
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const res = await fetch('https://admission-preferences.onrender.com/api/student/verify', {
+  const res = await fetch('https://admission-preferences.onrender.com/api/student/verify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(form),
+  });
 
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
-    });
+  const data = await res.json();
+  if (data.success) {
+    // ✅ Pass DOB in URL
+    router.push(`/preferences?appId=${form.applicationId}&dob=${encodeURIComponent(form.dob)}`);
+  } else {
+    setError(data.message);
+  }
+};
 
-    const data = await res.json();
-    if (data.success) {
-      router.push(`/preferences?appId=${form.applicationId}`);
-    } else {
-      setError(data.message);
-    }
-  };
 
   const handleReset = () => {
     setForm({ applicationId: '', dob: '' });
