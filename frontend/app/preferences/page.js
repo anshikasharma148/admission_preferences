@@ -1,7 +1,7 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { useState, Suspense } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 
 const branchOptions = {
   CSE: 'Computer Science & Engineering',
@@ -15,7 +15,6 @@ const branchOptions = {
   CE: 'Civil Engineering',
 };
 
-// ✅ NEW: Wrap the main component inside <Suspense>
 export default function Page() {
   return (
     <Suspense fallback={<div>Loading form...</div>}>
@@ -28,7 +27,7 @@ function PreferencesForm() {
   const params = useSearchParams();
   const appIdFromQuery = params.get('appId') || '';
 
-  const [form, setForm] = useState({
+  const initialFormState = {
     applicationNo: appIdFromQuery,
     name: '',
     rollNo: '',
@@ -43,7 +42,18 @@ function PreferencesForm() {
     Preference7: '',
     Preference8: '',
     Preference9: '',
-  });
+  };
+
+  const [form, setForm] = useState(initialFormState);
+  const [submitted, setSubmitted] = useState(false);
+
+  // Check localStorage on load
+  useEffect(() => {
+    const isSubmitted = localStorage.getItem('juet_preferences_submitted');
+    if (isSubmitted === 'true') {
+      setSubmitted(true);
+    }
+  }, []);
 
   const handleInputChange = (key, value) => {
     setForm(prev => ({ ...prev, [key]: value }));
@@ -60,7 +70,10 @@ function PreferencesForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const requiredFields = ['applicationNo', 'name', 'rollNo', 'dob', 'mobile', 'Preference1', 'Preference2', 'Preference3', 'Preference4'];
+    const requiredFields = [
+      'applicationNo', 'name', 'rollNo', 'dob', 'mobile',
+      'Preference1', 'Preference2', 'Preference3', 'Preference4'
+    ];
     const missing = requiredFields.filter(f => !form[f]);
     if (missing.length > 0) {
       alert('Please fill all required fields.');
@@ -81,7 +94,8 @@ function PreferencesForm() {
       const resultText = await response.text();
 
       if (response.ok && resultText.includes("success")) {
-        alert('Preferences submitted successfully!');
+        localStorage.setItem('juet_preferences_submitted', 'true');
+        setSubmitted(true);
       } else {
         alert('Failed to submit preferences.');
       }
@@ -91,14 +105,35 @@ function PreferencesForm() {
     }
   };
 
+  const handleClose = () => {
+    alert('You can now safely close the window.');
+  };
+
+  if (submitted) {
+    return (
+      <div className="min-h-screen bg-[#f0f0f8] flex items-center justify-center px-4">
+        <div className="text-center bg-white p-10 rounded-md shadow-lg border-t-4 border-orange-500">
+          <img src="/logo.jpeg" alt="JUET Logo" className="h-24 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-700">Thank you!</h2>
+          <p className="mt-2 text-gray-600">You have submitted the form successfully.</p>
+          <p className="mt-6 font-medium text-green-700">You can close now.</p>
+          <button
+            onClick={handleClose}
+            className="mt-4 px-6 py-2 bg-gray-700 text-white rounded-sm hover:bg-gray-800"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#f0f0f8] flex flex-col">
-      {/* Header */}
       <div className="w-full">
         <img src="/header.png" alt="JUET Header" className="w-full object-cover" />
       </div>
 
-      {/* Form Container */}
       <form onSubmit={handleSubmit} className="flex-grow px-4 py-10 flex justify-center">
         <div className="w-full max-w-3xl border border-orange-500 border-t-[3px] border-b-[20px] bg-white p-10 shadow-md">
           <div className="flex justify-between items-center mb-8">
@@ -106,7 +141,6 @@ function PreferencesForm() {
             <img src="/logo.jpeg" alt="JUET Logo" className="h-20 w-auto" />
           </div>
 
-          {/* Personal Info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
             <InputField label="Application ID." required value={form.applicationNo} onChange={e => handleInputChange('applicationNo', e.target.value)} />
             <InputField label="Name" required value={form.name} onChange={e => handleInputChange('name', e.target.value)} />
@@ -115,7 +149,6 @@ function PreferencesForm() {
             <InputField label="Mobile No." required value={form.mobile} onChange={e => handleInputChange('mobile', e.target.value)} maxLength={10} />
           </div>
 
-          {/* Preferences */}
           <h3 className="text-lg font-bold mb-4 text-gray-700">Branch Preferences</h3>
           {[...Array(9)].map((_, i) => {
             const prefKey = `Preference${i + 1}`;
@@ -139,7 +172,6 @@ function PreferencesForm() {
             );
           })}
 
-          {/* Submit */}
           <div className="flex justify-center mt-8">
             <button
               type="submit"
@@ -151,7 +183,6 @@ function PreferencesForm() {
         </div>
       </form>
 
-      {/* Footer */}
       <footer className="text-center mt-auto pb-6 text-sm text-gray-700">
         <p>
           For comments or suggestions, email at{' '}
@@ -164,7 +195,6 @@ function PreferencesForm() {
   );
 }
 
-// Reusable InputField component
 function InputField({ label, required, value, onChange, ...props }) {
   return (
     <div>

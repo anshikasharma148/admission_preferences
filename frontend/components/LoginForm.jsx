@@ -10,7 +10,7 @@ export default function LoginForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-   const res = await fetch('https://admission-preferences.onrender.com/api/student/verify', {
+    const res = await fetch('https://admission-preferences.onrender.com/api/student/verify', {
 
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
