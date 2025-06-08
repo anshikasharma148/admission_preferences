@@ -47,13 +47,12 @@ function PreferencesForm() {
   const [form, setForm] = useState(initialFormState);
   const [submitted, setSubmitted] = useState(false);
 
-  // Check localStorage on load
   useEffect(() => {
-    const isSubmitted = localStorage.getItem('juet_preferences_submitted');
+    const isSubmitted = localStorage.getItem(`juet_submitted_${appIdFromQuery}`);
     if (isSubmitted === 'true') {
       setSubmitted(true);
     }
-  }, []);
+  }, [appIdFromQuery]);
 
   const handleInputChange = (key, value) => {
     setForm(prev => ({ ...prev, [key]: value }));
@@ -94,7 +93,7 @@ function PreferencesForm() {
       const resultText = await response.text();
 
       if (response.ok && resultText.includes("success")) {
-        localStorage.setItem('juet_preferences_submitted', 'true');
+        localStorage.setItem(`juet_submitted_${form.applicationNo}`, 'true');
         setSubmitted(true);
       } else {
         alert('Failed to submit preferences.');
@@ -105,21 +104,17 @@ function PreferencesForm() {
     }
   };
 
-  const handleClose = () => {
-    alert('You can now safely close the window.');
-  };
-
   if (submitted) {
     return (
-      <div className="min-h-screen bg-[#f0f0f8] flex items-center justify-center px-4">
-        <div className="text-center bg-white p-10 rounded-md shadow-lg border-t-4 border-orange-500">
+      <div className="min-h-screen bg-[#f0f0f8] flex items-center justify-center">
+        <div className="text-center">
           <img src="/logo.jpeg" alt="JUET Logo" className="h-24 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-700">Thank you!</h2>
           <p className="mt-2 text-gray-600">You have submitted the form successfully.</p>
           <p className="mt-6 font-medium text-green-700">You can close now.</p>
           <button
-            onClick={handleClose}
-            className="mt-4 px-6 py-2 bg-gray-700 text-white rounded-sm hover:bg-gray-800"
+            className="mt-4 px-6 py-2 bg-gray-700 hover:bg-gray-800 text-white rounded-sm"
+            onClick={() => window.close()}
           >
             Close
           </button>
