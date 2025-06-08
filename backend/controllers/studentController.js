@@ -52,7 +52,10 @@ function verifyStudent(req, res) {
   );
 
   if (student) {
-    res.status(200).json({ success: true, message: 'Verified' });
+    if (student['Submitted'] === 'Yes') {
+      return res.status(400).json({ success: false, message: 'You have already submitted the form' });
+    }
+    return res.status(200).json({ success: true, message: 'Verified' });
   } else {
     res.status(404).json({ success: false, message: 'Student not found' });
   }
@@ -67,11 +70,20 @@ function submitPreferences(req, res) {
     return res.status(404).json({ success: false, message: 'Student not found' });
   }
 
-  students[index] = { ...students[index], ...preferences };
+  if (students[index]['Submitted'] === 'Yes') {
+    return res.status(400).json({ success: false, message: 'You have already submitted the form' });
+  }
+
+  students[index] = {
+    ...students[index],
+    ...preferences,
+    Submitted: 'Yes', // 🔐 Mark as submitted
+  };
   writeSheetData(students);
 
   res.status(200).json({ success: true, message: 'Preferences saved' });
 }
+
 
 
 module.exports = {
