@@ -47,6 +47,7 @@ function PreferencesForm() {
 
   const [form, setForm] = useState(initialFormState);
   const [submitted, setSubmitted] = useState(false);
+  const [mobileWarning, setMobileWarning] = useState('');
 
   useEffect(() => {
     const isSubmitted = localStorage.getItem(`juet_submitted_${appIdFromQuery}`);
@@ -77,6 +78,11 @@ function PreferencesForm() {
     const missing = requiredFields.filter(f => !form[f]);
     if (missing.length > 0) {
       alert('Please fill all required fields.');
+      return;
+    }
+
+    if (form.mobile.length !== 10) {
+      alert('Mobile number must be exactly 10 digits.');
       return;
     }
 
@@ -139,10 +145,34 @@ function PreferencesForm() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
             <InputField label="Application ID." required value={form.applicationNo} onChange={e => handleInputChange('applicationNo', e.target.value)} />
-            <InputField label="Name" required value={form.name} onChange={e => handleInputChange('name', e.target.value)} />
+            <InputField label="Name" required value={form.name} onChange={e => handleInputChange('name', e.target.value.toUpperCase())} />
             <InputField label="12th Roll No." required value={form.rollNo} onChange={e => handleInputChange('rollNo', e.target.value)} />
             <InputField label="Date of Birth (DD-MM-YYYY)" required value={form.dob} onChange={e => handleInputChange('dob', e.target.value)} />
-            <InputField label="Mobile No." required value={form.mobile} onChange={e => handleInputChange('mobile', e.target.value)} maxLength={10} />
+            
+            <div>
+              <label className="block font-bold text-gray-700 mb-1">
+                Mobile No. <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={form.mobile}
+                onChange={e => {
+                  const value = e.target.value;
+                  if (/^\d{0,10}$/.test(value)) {
+                    handleInputChange('mobile', value);
+                    if (value.length > 0 && value.length < 10) {
+                      setMobileWarning('Mobile number must be exactly 10 digits.');
+                    } else {
+                      setMobileWarning('');
+                    }
+                  }
+                }}
+                maxLength={10}
+                required
+                className="w-full px-4 py-2 border border-gray-400 rounded-sm focus:outline-none"
+              />
+              {mobileWarning && <p className="text-red-500 text-sm mt-1">{mobileWarning}</p>}
+            </div>
           </div>
 
           <h3 className="text-lg font-bold mb-4 text-gray-700">Branch Preferences</h3>
