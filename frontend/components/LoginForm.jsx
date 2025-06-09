@@ -8,23 +8,21 @@ export default function LoginForm() {
   const router = useRouter();
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const res = await fetch('https://admission-preferences.onrender.com/api/student/verify', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(form),
-  });
+    const res = await fetch('https://admission-preferences.onrender.com/api/student/verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(form),
+    });
 
-  const data = await res.json();
-  if (data.success) {
-    // ✅ Pass DOB in URL
-    router.push(`/preferences?appId=${form.applicationId}&dob=${encodeURIComponent(form.dob)}`);
-  } else {
-    setError(data.message);
-  }
-};
-
+    const data = await res.json();
+    if (data.success) {
+      router.push(`/preferences?appId=${form.applicationId}&dob=${encodeURIComponent(form.dob)}`);
+    } else {
+      setError(data.message);
+    }
+  };
 
   const handleReset = () => {
     setForm({ applicationId: '', dob: '' });
@@ -45,7 +43,6 @@ export default function LoginForm() {
         className="flex flex-col flex-grow items-center justify-center px-4 py-10"
       >
         <div className="w-full max-w-2xl border border-orange-500 border-t-[3px] border-b-[20px] bg-white p-10 shadow-md">
-
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-xl md:text-2xl font-bold text-[#333]">
               Branch Preference Form
@@ -65,7 +62,7 @@ export default function LoginForm() {
               value={form.applicationId}
               onChange={(e) => setForm({ ...form, applicationId: e.target.value })}
               required
-              className="w-full px-4 py-2 border border-gray-400 rounded-sm focus:outline-none"
+              className="w-full px-4 py-2 border border-gray-400 rounded-sm focus:outline-none text-black"
             />
             <p className="text-xs text-gray-500 mt-1">Format: JEG250000</p>
           </div>
@@ -80,7 +77,7 @@ export default function LoginForm() {
               value={form.dob}
               onChange={(e) => setForm({ ...form, dob: e.target.value })}
               required
-              className="w-full px-4 py-2 border border-gray-400 rounded-sm focus:outline-none"
+              className="w-full px-4 py-2 border border-gray-400 rounded-sm focus:outline-none text-black"
             />
           </div>
 
