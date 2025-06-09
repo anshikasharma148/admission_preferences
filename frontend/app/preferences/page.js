@@ -47,6 +47,7 @@ function PreferencesForm() {
 
   const [form, setForm] = useState(initialFormState);
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [mobileWarning, setMobileWarning] = useState('');
 
   useEffect(() => {
@@ -71,6 +72,8 @@ function PreferencesForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (isSubmitting) return; // Prevent further calls
+
     const requiredFields = [
       'applicationNo', 'name', 'rollNo', 'dob', 'mobile',
       'Preference1', 'Preference2', 'Preference3', 'Preference4'
@@ -85,6 +88,8 @@ function PreferencesForm() {
       alert('Mobile number must be exactly 10 digits.');
       return;
     }
+
+    setIsSubmitting(true); // Disable the button
 
     try {
       const formData = new FormData();
@@ -104,10 +109,12 @@ function PreferencesForm() {
         setSubmitted(true);
       } else {
         alert('Failed to submit preferences.');
+        setIsSubmitting(false); // Enable if error
       }
     } catch (error) {
       console.error(error);
       alert('An error occurred while submitting the form.');
+      setIsSubmitting(false); // Enable if error
     }
   };
 
@@ -148,7 +155,7 @@ function PreferencesForm() {
             <InputField label="Name" required value={form.name} onChange={e => handleInputChange('name', e.target.value.toUpperCase())} />
             <InputField label="12th Roll No." required value={form.rollNo} onChange={e => handleInputChange('rollNo', e.target.value)} />
             <InputField label="Date of Birth (DD-MM-YYYY)" required value={form.dob} onChange={e => handleInputChange('dob', e.target.value)} />
-            
+
             <div>
               <label className="block font-bold text-gray-700 mb-1">
                 Mobile No. <span className="text-red-500">*</span>
@@ -201,9 +208,12 @@ function PreferencesForm() {
           <div className="flex justify-center mt-8">
             <button
               type="submit"
-              className="bg-gray-700 hover:bg-gray-800 text-white px-6 py-2 rounded-sm font-medium"
+              disabled={isSubmitting}
+              className={`px-6 py-2 rounded-sm font-medium text-white ${
+                isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-gray-700 hover:bg-gray-800'
+              }`}
             >
-              Submit Preferences
+              {isSubmitting ? 'Submitting...' : 'Submit Preferences'}
             </button>
           </div>
         </div>
